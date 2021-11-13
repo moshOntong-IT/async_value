@@ -1,11 +1,14 @@
+import 'package:async_value/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends ConsumerWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    var items = ['Sugar', 'Rice'];
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemProvider = ref.watch(itemStateProvider);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -44,14 +47,48 @@ class MyHomePage extends StatelessWidget {
                 height: 20,
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return Tile(
-                      index: index,
-                      title: items[index],
-                    );
+                child: RefreshIndicator(
+                  onRefresh: () {
+                    return ref.read(itemStateProvider.notifier).refresh();
                   },
+                  child: itemProvider.when(
+                    data: (data) {
+                      // print(data.length);
+                      return ListView.builder(
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          return Tile(
+                            index: index,
+                            title: data[index].name,
+                          );
+                        },
+                      );
+                    },
+                    error: (error, st) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('$error'),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            height: 40,
+                            width: 100,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                ref.read(itemStateProvider.notifier).refresh();
+                              },
+                              child: const Text('Retry'),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
                 ),
               ),
             ],
