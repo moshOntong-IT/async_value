@@ -60,6 +60,8 @@ class MyHomePage extends ConsumerWidget {
                           return Tile(
                             index: index,
                             title: data[index].name,
+                            ref: ref,
+                            id: data[index].id,
                           );
                         },
                       );
@@ -100,18 +102,21 @@ class MyHomePage extends ConsumerWidget {
 }
 
 class Tile extends StatelessWidget {
-  final int index;
-  final String title;
   const Tile({
     Key? key,
     required this.index,
     required this.title,
+    required this.ref,
+    required this.id,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: UniqueKey(),
+      onDismissed: (direction) {
+        ref.read(itemStateProvider.notifier).removeItem(id);
+      },
       confirmDismiss: (direction) async {
         return await showDialog(
             context: context,
@@ -163,4 +168,9 @@ class Tile extends StatelessWidget {
       ),
     );
   }
+
+  final int index;
+  final String title;
+  final WidgetRef ref;
+  final int id;
 }

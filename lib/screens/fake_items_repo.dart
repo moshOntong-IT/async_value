@@ -11,6 +11,7 @@ final _sampleJsonItem = [
 
 abstract class ItemRepository {
   Future<List<Item>> fetchItems();
+  Future<void> removeItem(int id);
 }
 
 class FakeItemRepository implements ItemRepository {
@@ -26,15 +27,27 @@ class FakeItemRepository implements ItemRepository {
   @override
   Future<List<Item>> fetchItems() async {
     await Future.delayed(const Duration(seconds: 2), () {});
-    print('test');
+    // print('test');
     double result = random.nextDouble();
 
     if (result < 0.3) {
-      print(result);
+      // print(result);
       throw ItemException('Cannot retrieve datas');
     } else {
-      print('wala');
+      // print('wala');
       return itemLists;
+    }
+  }
+
+  @override
+  Future<void> removeItem(int id) async {
+    await Future.delayed(const Duration(seconds: 2), () {});
+    if (random.nextDouble() < 0.3) {
+      // print(result);
+      throw ItemException('Cannot retrieve datas');
+    } else {
+      // print('wala');
+      itemLists = itemLists.where((element) => element.id != id).toList();
     }
   }
 }

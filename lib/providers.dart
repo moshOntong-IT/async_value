@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final repoProvider = Provider<ItemRepository>((ref) => FakeItemRepository());
 
+//TODO try daw e dli e pass ang parameter sa read
 final itemStateProvider =
     StateNotifierProvider<ItemState, AsyncValue<List<Item>>>((ref) {
-  return ItemState(ref.read);
+  final repo = ref.watch(repoProvider);
+  return ItemState(repo);
 });
